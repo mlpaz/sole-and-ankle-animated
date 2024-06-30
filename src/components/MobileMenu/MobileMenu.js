@@ -1,32 +1,85 @@
 /* eslint-disable no-unused-vars */
-import React from 'react';
-import styled from 'styled-components/macro';
-import { DialogOverlay, DialogContent } from '@reach/dialog';
+import React from "react";
+import styled, { keyframes } from "styled-components/macro";
 
-import { QUERIES, WEIGHTS } from '../../constants';
+import { WEIGHTS } from "../../constants";
 
-import UnstyledButton from '../UnstyledButton';
-import Icon from '../Icon';
-import VisuallyHidden from '../VisuallyHidden';
+import UnstyledButton from "../UnstyledButton";
+import Icon from "../Icon";
+import VisuallyHidden from "../VisuallyHidden";
+
+const navLinkList = [
+  { href: "/sale", content: "Sale" },
+  { href: "/new", content: "New Releases" },
+  { href: "/men", content: "Men" },
+  { href: "/women", content: "Women" },
+  { href: "/kids", content: "Kids" },
+  { href: "/collections", content: "Collections" },
+];
 
 const MobileMenu = ({ isOpen, onDismiss }) => {
+  React.useEffect(() => {
+    function handleKeydown(ev) {
+      if (ev.key === "Escape") {
+        onDismiss();
+      }
+    }
+    document.body.style.overflow = isOpen ? "hidden" : "auto";
+    window.addEventListener("keydown", handleKeydown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  });
+  const { backdropStyles, modalStyles } = getTransitionStyles(isOpen);
+  const contentDelay = isOpen ? 300 : 600;
+  const footerDelay = contentDelay + (navLinkList.length + 1) * 100;
+
   return (
-    <Overlay isOpen={isOpen} onDismiss={onDismiss}>
-      <Content aria-label="Menu">
+    <Overlay
+      isOpen={isOpen}
+      onDismiss={onDismiss}
+      style={{ pointerEvents: isOpen ? "auto" : "none" }}
+    >
+      <Backdrop style={{ opacity: isOpen ? 1 : 0, ...backdropStyles }} />
+      <Content
+        aria-label="Menu"
+        style={{
+          transform: isOpen
+            ? "translateX(0px) rotateY(0deg) "
+            : "rotateY(-90deg) translateX(100%)",
+          ...modalStyles,
+        }}
+      >
         <CloseButton onClick={onDismiss}>
           <Icon id="close" />
           <VisuallyHidden>Dismiss menu</VisuallyHidden>
         </CloseButton>
         <Filler />
         <Nav>
-          <NavLink href="/sale">Sale</NavLink>
-          <NavLink href="/new">New&nbsp;Releases</NavLink>
-          <NavLink href="/men">Men</NavLink>
-          <NavLink href="/women">Women</NavLink>
-          <NavLink href="/kids">Kids</NavLink>
-          <NavLink href="/collections">Collections</NavLink>
+          {navLinkList.map((navLink, i) => {
+            const delay = contentDelay + i * 100;
+            return (
+              <NavLink
+                key={`${navLink.content}-${i}`}
+                href={navLink.href}
+                style={{
+                  opacity: isOpen ? 1 : 0,
+                  transform: isOpen ? "translateX(0)" : "translateX(12px)",
+                  transitionDelay: `${delay}ms`,
+                }}
+              >
+                {navLink.content}
+              </NavLink>
+            );
+          })}
         </Nav>
-        <Footer>
+        <Footer
+          style={{
+            opacity: isOpen ? 1 : 0,
+            transitionDelay: `${footerDelay}ms`,
+          }}
+        >
           <SubLink href="/terms">Terms and Conditions</SubLink>
           <SubLink href="/privacy">Privacy Policy</SubLink>
           <SubLink href="/contact">Contact Us</SubLink>
@@ -36,18 +89,47 @@ const MobileMenu = ({ isOpen, onDismiss }) => {
   );
 };
 
-const Overlay = styled(DialogOverlay)`
+function getTransitionStyles(isOpen) {
+  return {
+    backdropStyles: {
+      transition: "opacity",
+      transitionDuration: isOpen ? "600ms" : "600ms",
+      transitionDelay: isOpen ? "0ms" : "100ms",
+    },
+    modalStyles: {
+      transition: "transform",
+      transitionDuration: isOpen ? "400ms" : "500ms",
+      transitionDelay: isOpen ? "250ms" : "0ms",
+      transitionTimingFunction: isOpen
+        ? "cubic-bezier(0,1.71,.25,.83)"
+        : "cubic-bezier(.01,1.1,.83,.2)",
+    },
+  };
+}
+
+const Overlay = styled.div`
+  perspective: "250px";
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--color-backdrop);
-  display: flex;
-  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
 `;
 
-const Content = styled(DialogContent)`
+const Backdrop = styled.div`
+  position: absolute;
+  inset: 0;
+  background: var(--color-backdrop);
+`;
+
+const Content = styled.div`
+  transform-origin: center right;
+  position: absolute;
+  right: 0px;
   background: white;
   width: 300px;
   height: 100%;
@@ -70,6 +152,7 @@ const Nav = styled.nav`
 `;
 
 const NavLink = styled.a`
+  transition: opacity 200ms ease-in, transform 200ms ease-in;
   color: var(--color-gray-900);
   font-weight: ${WEIGHTS.medium};
   text-decoration: none;
@@ -85,6 +168,7 @@ const Filler = styled.div`
   flex: 1;
 `;
 const Footer = styled.footer`
+  transition: opacity 250ms ease-in;
   flex: 1;
   display: flex;
   flex-direction: column;
