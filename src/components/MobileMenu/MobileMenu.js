@@ -102,13 +102,13 @@ function getTransitionStyles(isOpen) {
       transitionDelay: isOpen ? "250ms" : "0ms",
       transitionTimingFunction: isOpen
         ? "cubic-bezier(0,2.07,.83,.67)"
-        : "cubic-bezier(.01,1.1,.83,.2)",
+        : "cubic-bezier(0,1.17,1,.01)",
     },
   };
 }
 
 const Overlay = styled.div`
-  perspective: "250px";
+  perspective: "150px";
   position: fixed;
   top: 0;
   left: 0;
