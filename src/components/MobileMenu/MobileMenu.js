@@ -46,8 +46,8 @@ const MobileMenu = ({ isOpen, onDismiss }) => {
         aria-label="Menu"
         style={{
           transform: isOpen
-            ? "translateX(0px) rotateY(0deg) "
-            : "rotateY(-90deg) translateX(100%)",
+            ? "translateX(0%)  rotateY(0deg) "
+            : "translateX(35%) rotateY(-75deg) ",
           ...modalStyles,
         }}
       >
@@ -98,10 +98,10 @@ function getTransitionStyles(isOpen) {
     },
     modalStyles: {
       transition: "transform",
-      transitionDuration: isOpen ? "400ms" : "500ms",
+      transitionDuration: isOpen ? "400ms" : "600ms",
       transitionDelay: isOpen ? "250ms" : "0ms",
       transitionTimingFunction: isOpen
-        ? "cubic-bezier(0,1.71,.25,.83)"
+        ? "cubic-bezier(0,2.07,.83,.67)"
         : "cubic-bezier(.01,1.1,.83,.2)",
     },
   };
@@ -127,11 +127,13 @@ const Backdrop = styled.div`
 `;
 
 const Content = styled.div`
+  --overfill: 16px;
   transform-origin: center right;
   position: absolute;
   right: 0px;
   background: white;
-  width: 300px;
+  margin-right: calc(var(--overfill) * -1);
+  width: calc(300px + var(--overfill));
   height: 100%;
   padding: 24px 32px;
   display: flex;
@@ -141,7 +143,7 @@ const Content = styled.div`
 const CloseButton = styled(UnstyledButton)`
   position: absolute;
   top: 10px;
-  right: 0;
+  right: var(--overfill);
   padding: 16px;
 `;
 

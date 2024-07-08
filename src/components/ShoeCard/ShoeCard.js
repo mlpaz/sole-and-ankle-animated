@@ -36,9 +36,10 @@ const ShoeCard = ({
       <Wrapper>
         <ImageWrapper>
           <Image alt="" src={imageSrc} />
-          {variant === "on-sale" && <SaleFlag>Sale</SaleFlag>}
-          {variant === "new-release" && <NewFlag>Just released!</NewFlag>}
         </ImageWrapper>
+
+        {variant === "on-sale" && <SaleFlag>Sale</SaleFlag>}
+        {variant === "new-release" && <NewFlag>Just released!</NewFlag>}
         <Spacer size={12} />
         <Row>
           <Name>{name}</Name>
@@ -69,7 +70,9 @@ const Link = styled.a`
   color: inherit;
 `;
 
-const Wrapper = styled.article``;
+const Wrapper = styled.article`
+  position: relative;
+`;
 
 const ImageWrapper = styled.div`
   border-radius: 16px 16px 4px 4px;
@@ -79,11 +82,17 @@ const ImageWrapper = styled.div`
 
 const Image = styled.img`
   width: 100%;
-  transition: transform 500ms, filter 250ms;
+  transition: transform 600ms, filter 350ms;
+  filter: brightness(95%);
   transform-origin: 50% 75%;
-  &:hover {
-    filter: saturate(2.5) brightness(1.015);
-    transform: scale(1.1);
+  will-change: transform;
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    ${Link}:hover &,
+    ${Link}:focus  & {
+      transition: transform 200ms, filter 250ms;
+      filter: saturate(2) brightness(100%);
+      transform: scale(1.1);
+    }
   }
 `;
 
@@ -143,7 +152,8 @@ const Flag = styled.div`
   border-radius: 2px;
   animation: ${satureInOut} 1000ms infinite alternate linear;
   animation-play-state: paused;
-  ${ImageWrapper}:hover & {
+  ${Link}:hover &,
+  ${Link}:focus & {
     animation-play-state: running;
   }
 `;
